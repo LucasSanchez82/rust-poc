@@ -230,6 +230,7 @@ dependencies = [
  "anyhow",
  "axum",
  "chrono",
+ "dotenvy",
  "migration",
  "sea-orm",
  "serde",

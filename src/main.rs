@@ -1,16 +1,14 @@
 use anyhow::Error;
 use anyhow::Result;
-use axum::routing::MethodRouter;
 use axum::{Router, routing::get};
-use sea_orm::DatabaseConnection;
 use tower_http::trace::TraceLayer;
 use tracing::info;
-use tracing::instrument::WithSubscriber;
 
-use crate::modules::states::ConnectionState;
 use crate::modules::user::route::user_router;
+use crate::utils::cfg::Config;
 
 pub mod modules;
+pub mod utils;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -23,9 +21,10 @@ async fn main() -> Result<(), Error> {
         // sets this to be the default, global subscriber for this application.
         .init();
 
-    let database_url = "postgres://postgres:password@localhost:5432/database".to_owned();
-    info!("Trying to connect to database...");
-    let connection = sea_orm::Database::connect(database_url).await?;
+    let config = Config::new();
+
+    info!("Trying to connect to database... [{}]", config.database_url);
+    let connection = sea_orm::Database::connect(config.database_url).await?;
     Migrator::up(&connection, None).await?;
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
