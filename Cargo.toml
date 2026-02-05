@@ -1,0 +1,29 @@
+cargo-features = ["codegen-backend"]
+[package]
+name = "axum-server-poc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = { version = "0.8.8", features = ["tracing", "json", "macros"] }
+chrono = "0.4.43"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+tokio = { version = "1.49.0", features = ["macros", "rt-multi-thread"] }
+tracing = "0.1.44"
+tracing-subscriber = "0.3.22"
+
+migration = { path = "migration" }
+sea-orm = { version = "2.0.0-rc.30", features = ["macros", "with-json", "time", "uuid", "with-chrono", "sqlx-postgres", "runtime-tokio-native-tls"] }
+anyhow = "1.0.100"
+tower-http = { version = "0.6.8", features = ["trace"] }
+[workspace]
+members = [".", "migration"]
+
+
+[profile.dev]
+debug = "line-tables-only"
+strip = false
+panic = "abort"
+split-debuginfo = "off"
+codegen-backend = "cranelift"
