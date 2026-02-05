@@ -12,20 +12,19 @@ pub mod utils;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    // build our application with a single routew-*+
     use migration::{Migrator, MigratorTrait};
 
     tracing_subscriber::fmt()
-        // enable everything
         .with_max_level(tracing::Level::TRACE)
-        // sets this to be the default, global subscriber for this application.
         .init();
 
     let config = Config::new();
 
     info!("Trying to connect to database... [{}]", config.database_url);
     let connection = sea_orm::Database::connect(config.database_url).await?;
+
     Migrator::up(&connection, None).await?;
+
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
         .nest("/users", user_router())
@@ -33,8 +32,8 @@ async fn main() -> Result<(), Error> {
         .layer(TraceLayer::new_for_http());
 
     // run our app with hyper, listening globally on port 3000
-    let target = "0.0.0.0:3000";
-    let listener = tokio::net::TcpListener::bind(target).await.unwrap();
+    let target = format!("{}:{}", config.host, config.port);
+    let listener = tokio::net::TcpListener::bind(&target).await.unwrap();
 
     info!("The server is running on http://{}", target);
     axum::serve(listener, app).await.unwrap();
