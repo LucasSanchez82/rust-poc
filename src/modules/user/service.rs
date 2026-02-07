@@ -61,7 +61,7 @@ impl Service<UserDto, CreateUser> for UserService {
         let db = self.db.as_ref();
         let deleted_user = UserEntity::delete_by_id(id).exec_with_returning(db).await;
 
-        return match deleted_user {
+        match deleted_user {
             Err(error) => {
                 let error_message = format!("Error during delete of users with id: {}", id);
                 Err(ApiError::new(
@@ -72,23 +72,23 @@ impl Service<UserDto, CreateUser> for UserService {
             }
             Ok(deleted_user) => {
                 if let Some(deleted_user) = deleted_user {
-                    return Ok(Json(UserDto::from(deleted_user)));
+                    Ok(Json(UserDto::from(deleted_user)))
                 } else {
-                    return Err(ApiError::new(
+                    Err(ApiError::new(
                         StatusCode::NOT_FOUND,
                         format!("The requested user with id {} is not found", id),
                         None,
-                    ));
+                    ))
                 }
             }
-        };
+        }
     }
     async fn get_all(&self) -> ApiResponse<Box<[UserDto]>> {
         let users = UserEntity::find().all(self.db()).await.unwrap();
         info!("{:#?}", users);
         let users: Box<[UserDto]> = users
             .iter()
-            .map(|user| UserDto::from(user))
+            .map(UserDto::from)
             .collect::<Vec<_>>()
             .into_boxed_slice();
         Ok(Json(users))

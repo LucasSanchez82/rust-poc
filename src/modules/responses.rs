@@ -14,11 +14,11 @@ pub struct ApiError {
 
 impl ApiError {
     pub fn new(status: StatusCode, error: String, details: Option<String>) -> Self {
-        return Self {
+        Self {
             status: status.into(),
             details,
             error,
-        };
+        }
     }
 }
 

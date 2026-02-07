@@ -18,8 +18,8 @@ pub fn user_router() -> Router<AppState> {
 
 async fn handle_get_users(State(state): State<AppState>) -> ApiResponse<Box<[UserDto]>> {
     let user_svc = UserService::new(state.connection);
-    let users_response = user_svc.get_all().await;
-    users_response
+    
+    user_svc.get_all().await
 }
 
 async fn handle_delete_user(
@@ -28,9 +28,9 @@ async fn handle_delete_user(
     Json(payload): Json<DeleteUser>,
 ) -> ApiResponse<UserDto> {
     let user_svc = UserService::new(state.connection);
-    let deleted_user_response = user_svc.delete(payload.id).await;
+    
 
-    deleted_user_response
+    user_svc.delete(payload.id).await
 }
 
 async fn handle_create_user(
@@ -39,6 +39,6 @@ async fn handle_create_user(
     extract::Json(payload): extract::Json<CreateUser>,
 ) -> ApiResponse<UserDto> {
     let user_svc = UserService::new(state.connection);
-    let created_user_response = user_svc.create(payload).await;
-    created_user_response
+    
+    user_svc.create(payload).await
 }
