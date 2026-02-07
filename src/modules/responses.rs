@@ -5,6 +5,8 @@ use axum::{
 };
 use serde::Serialize;
 
+use crate::modules::errors::ServiceError;
+
 #[derive(Serialize)]
 pub struct ApiError {
     status: u16,
@@ -18,6 +20,16 @@ impl ApiError {
             status: status.into(),
             details,
             error,
+        }
+    }
+}
+
+impl From<ServiceError> for ApiError {
+    fn from(err: ServiceError) -> Self {
+        Self {
+            status: err.status.into(),
+            error: err.message,
+            details: err.details,
         }
     }
 }
