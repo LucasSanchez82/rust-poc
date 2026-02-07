@@ -1,0 +1,24 @@
+use serde::Serialize;
+
+use crate::modules::models::entities::user::ActiveModel as UserActiveModel;
+use crate::modules::models::entities::user::Column as UserColumn;
+use crate::modules::models::entities::user::Entity as UserEntity;
+use crate::modules::models::entities::user::Model as UserModel;
+
+#[derive(Serialize)]
+pub struct UserDto {
+    pub id: i32,
+    pub name: String,
+    pub email: String,
+}
+
+// TODO: TEST IF THAT POSSIBLE TO USE &str INSTEAD OF STRING using to_owned()
+impl From<&UserModel> for UserDto {
+    fn from(user: &UserModel) -> Self {
+        UserDto {
+            id: user.id.to_owned(),
+            name: user.name.to_owned(),
+            email: user.email.to_owned(),
+        }
+    }
+}

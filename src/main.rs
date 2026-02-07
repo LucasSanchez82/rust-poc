@@ -1,9 +1,12 @@
+use std::sync::Arc;
+
 use anyhow::Error;
 use anyhow::Result;
 use axum::{Router, routing::get};
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
+use crate::modules::states::AppState;
 use crate::modules::user::route::user_router;
 use crate::utils::cfg::Config;
 
@@ -21,14 +24,15 @@ async fn main() -> Result<(), Error> {
     let config = Config::new();
 
     info!("Trying to connect to database... [{}]", config.database_url);
-    let connection = sea_orm::Database::connect(config.database_url).await?;
+    let connection = Arc::new(sea_orm::Database::connect(config.database_url).await?);
+    Migrator::up(connection.as_ref(), None).await?;
 
-    Migrator::up(&connection, None).await?;
+    let app_state = AppState { connection };
 
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
         .nest("/users", user_router())
-        .with_state(connection)
+        .with_state(app_state)
         .layer(TraceLayer::new_for_http());
 
     // run our app with hyper, listening globally on port 3000
