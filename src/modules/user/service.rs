@@ -1,5 +1,9 @@
 use std::sync::Arc;
 
+use argon2::{
+    Argon2,
+    password_hash::{PasswordHasher, SaltString, rand_core::OsRng},
+};
 use sea_orm::DatabaseConnection;
 use sea_orm::EntityTrait;
 use sea_orm::{ActiveModelTrait, ActiveValue};
@@ -12,8 +16,9 @@ use crate::modules::types::ServiceResult;
 use crate::modules::user::dto::UserDto;
 use crate::modules::user::payload::CreateUser;
 
-pub struct UserService {
+pub struct UserService<'a> {
     db: Arc<DatabaseConnection>,
+    argon2: Argon2<'a>,
 }
 
 #[allow(async_fn_in_trait)]
@@ -27,9 +32,17 @@ pub trait Service<T, P> {
     async fn get_one(&self, id: i32) -> ServiceResult<T>;
 }
 
-impl Service<UserDto, CreateUser> for UserService {
+impl<'a> UserService<'a> {
+    fn argon2(&self) -> &Argon2<'a> {
+        &self.argon2
+    }
+}
+
+impl<'a> Service<UserDto, CreateUser> for UserService<'a> {
     fn new(db: Arc<DatabaseConnection>) -> Self {
-        Self { db }
+        let argon2 = Argon2::default();
+
+        Self { db, argon2 }
     }
 
     fn db(&self) -> &DatabaseConnection {
@@ -37,10 +50,17 @@ impl Service<UserDto, CreateUser> for UserService {
     }
 
     async fn create(&self, payload: CreateUser) -> ServiceResult<UserDto> {
+        let salt = SaltString::generate(&mut OsRng);
+        let password_hash = self
+            .argon2()
+            .hash_password(payload.password.as_bytes(), &salt)
+            .unwrap()
+            .to_string();
+
         let new_user = UserActiveModel {
             name: ActiveValue::Set(payload.name),
             email: ActiveValue::Set(payload.email),
-            password: ActiveValue::Set(payload.password),
+            password: ActiveValue::Set(password_hash),
             ..Default::default()
         };
 
