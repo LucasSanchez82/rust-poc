@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use migration::async_trait::async_trait;
 use sea_orm::DatabaseConnection;
 use sea_orm::EntityTrait;
 use tracing::info;
@@ -11,6 +12,7 @@ pub struct UserService {
     db: Arc<DatabaseConnection>,
 }
 
+#[async_trait]
 pub trait Service<T> {
     fn new(db: Arc<DatabaseConnection>) -> Self;
     fn db(&self) -> &DatabaseConnection;
@@ -21,6 +23,7 @@ pub trait Service<T> {
     async fn get_one(&self, id: i32) -> T;
 }
 
+#[async_trait]
 impl Service<UserDto> for UserService {
     fn new(db: Arc<DatabaseConnection>) -> Self {
         Self { db }
