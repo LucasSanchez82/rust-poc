@@ -24,7 +24,7 @@ struct CreateUser {
 
 #[derive(Deserialize)]
 struct DeleteUser {
-    email: String,
+    id: i32,
 }
 
 pub fn user_router() -> Router<AppState> {
@@ -44,31 +44,10 @@ async fn handle_delete_user(
     State(state): State<AppState>,
 
     Json(payload): Json<DeleteUser>,
-) -> Result<Json<Vec<UserDto>>, ApiError> {
-    let db = state.connection.as_ref();
-    let deleted_user = UserEntity::delete_many()
-        .filter(UserColumn::Email.eq(&payload.email))
-        .exec_with_returning(db)
-        .await;
+) -> Result<Json<UserDto>, ApiError> {
+    let user_svc = UserService::new(state.connection);
 
-    return match deleted_user {
-        Err(error) => {
-            let error_message =
-                format!("Error during delete of users with email: {}", payload.email);
-            Err(ApiError::new(
-                StatusCode::INTERNAL_SERVER_ERROR,
-                error_message,
-                Some(error.to_string()),
-            ))
-        }
-        Ok(deleted_user) => {
-            let deleted_users_dto: Vec<UserDto> = deleted_user
-                .iter()
-                .map(|user| UserDto::from(user))
-                .collect();
-            return Ok(Json(deleted_users_dto));
-        }
-    };
+    user_svc.delete(payload.id).await
 }
 
 async fn handle_create_user(

@@ -19,3 +19,9 @@ impl From<&UserModel> for UserDto {
         }
     }
 }
+
+impl From<UserModel> for UserDto {
+    fn from(user: UserModel) -> Self {
+        UserDto::from(&user)
+    }
+}
