@@ -12,7 +12,7 @@ use crate::modules::models::entities::user::Entity as UserEntity;
 use crate::modules::responses::ApiError;
 use crate::modules::types::ApiResponse;
 use crate::modules::user::dto::UserDto;
-use crate::modules::user::request::CreateUser;
+use crate::modules::user::payload::CreateUser;
 
 pub struct UserService {
     db: Arc<DatabaseConnection>,

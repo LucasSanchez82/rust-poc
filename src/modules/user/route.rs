@@ -5,7 +5,7 @@ use axum::{Json, Router, extract};
 use crate::modules::states::AppState;
 use crate::modules::types::ApiResponse;
 use crate::modules::user::dto::UserDto;
-use crate::modules::user::request::{CreateUser, DeleteUser};
+use crate::modules::user::payload::{CreateUser, DeleteUser};
 use crate::modules::user::service::Service;
 use crate::modules::user::service::UserService;
 

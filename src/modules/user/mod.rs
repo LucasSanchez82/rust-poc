@@ -1,4 +1,4 @@
 pub mod dto;
-pub mod request;
+pub mod payload;
 pub mod route;
 pub mod service;

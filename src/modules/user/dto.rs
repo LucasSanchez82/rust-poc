@@ -13,7 +13,7 @@ pub struct UserDto {
 impl From<&UserModel> for UserDto {
     fn from(user: &UserModel) -> Self {
         UserDto {
-            id: user.id.to_owned(),
+            id: user.id,
             name: user.name.to_owned(),
             email: user.email.to_owned(),
         }
