@@ -1,8 +1,5 @@
 use serde::Serialize;
 
-use crate::modules::models::entities::user::ActiveModel as UserActiveModel;
-use crate::modules::models::entities::user::Column as UserColumn;
-use crate::modules::models::entities::user::Entity as UserEntity;
 use crate::modules::models::entities::user::Model as UserModel;
 
 #[derive(Serialize)]

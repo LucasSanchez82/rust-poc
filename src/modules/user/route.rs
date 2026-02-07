@@ -1,18 +1,15 @@
-use std::sync::Arc;
 
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::Result;
 use axum::routing::{delete, get, post};
 use axum::{Json, Router, extract};
-use sea_orm::{ActiveModelTrait, ActiveValue, ColumnTrait, DatabaseConnection, QueryFilter};
-use serde::{Deserialize, Serialize};
-use tracing::info;
+use sea_orm::{ActiveModelTrait, ActiveValue, ColumnTrait, QueryFilter};
+use serde::Deserialize;
 
 use crate::modules::models::entities::user::ActiveModel as UserActiveModel;
 use crate::modules::models::entities::user::Column as UserColumn;
 use crate::modules::models::entities::user::Entity as UserEntity;
-use crate::modules::models::entities::user::Model as UserModel;
 use crate::modules::responses::ApiError;
 use crate::modules::states::AppState;
 use crate::modules::user::dto::UserDto;

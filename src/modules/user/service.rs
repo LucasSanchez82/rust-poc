@@ -4,10 +4,7 @@ use sea_orm::DatabaseConnection;
 use sea_orm::EntityTrait;
 use tracing::info;
 
-use crate::modules::models::entities::user::ActiveModel as UserActiveModel;
-use crate::modules::models::entities::user::Column as UserColumn;
 use crate::modules::models::entities::user::Entity as UserEntity;
-use crate::modules::models::entities::user::Model as UserModel;
 use crate::modules::user::dto::UserDto;
 
 pub struct UserService {
@@ -34,7 +31,7 @@ impl Service<UserDto> for UserService {
     async fn create(&self) -> UserDto {
         todo!();
     }
-    async fn delete(&self, id: i32) -> UserDto {
+    async fn delete(&self, _id: i32) -> UserDto {
         todo!();
     }
     async fn get_all(&self) -> Box<[UserDto]> {
@@ -47,10 +44,10 @@ impl Service<UserDto> for UserService {
             .into_boxed_slice();
         users
     }
-    async fn get_one(&self, id: i32) -> UserDto {
+    async fn get_one(&self, _id: i32) -> UserDto {
         todo!();
     }
-    async fn update(&self, id: i32) -> UserDto {
+    async fn update(&self, _id: i32) -> UserDto {
         todo!();
     }
 }
