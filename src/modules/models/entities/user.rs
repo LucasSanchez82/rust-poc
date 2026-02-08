@@ -3,6 +3,7 @@
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
 
+#[sea_orm::model]
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
 #[sea_orm(table_name = "user")]
 pub struct Model {
@@ -12,18 +13,10 @@ pub struct Model {
     #[sea_orm(unique)]
     pub email: String,
     pub password: String,
-}
-
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {
-    #[sea_orm(has_many = "super::post::Entity")]
-    Post,
-}
-
-impl Related<super::post::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Post.def()
-    }
+    #[sea_orm(has_many)]
+    pub posts: HasMany<super::post::Entity>,
+    #[sea_orm(has_many)]
+    pub sessions: HasMany<super::session::Entity>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

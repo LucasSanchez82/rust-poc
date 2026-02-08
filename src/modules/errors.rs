@@ -21,12 +21,16 @@ impl ServiceError {
         self
     }
 
-    pub fn internal(message: impl Into<String>) -> Self {
+    pub fn internal(message: impl Into<String> + tracing::Value) -> Self {
         Self::new(StatusCode::INTERNAL_SERVER_ERROR, message)
     }
 
     pub fn not_found(message: impl Into<String>) -> Self {
         Self::new(StatusCode::NOT_FOUND, message)
+    }
+
+    pub fn unauthorized(message: impl Into<String>) -> Self {
+        Self::new(StatusCode::UNAUTHORIZED, message)
     }
 }
 

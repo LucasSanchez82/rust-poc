@@ -2,11 +2,13 @@ use std::sync::Arc;
 
 use anyhow::Error;
 use anyhow::Result;
+use axum::routing::post;
 use axum::{Router, routing::get};
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
 use crate::modules::states::AppState;
+use crate::modules::user::route::handle_login;
 use crate::modules::user::route::user_router;
 use crate::utils::cfg::Config;
 
@@ -31,6 +33,7 @@ async fn main() -> Result<(), Error> {
 
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
+        .route("/login", post(handle_login))
         .nest("/users", user_router())
         .with_state(app_state)
         .layer(TraceLayer::new_for_http());

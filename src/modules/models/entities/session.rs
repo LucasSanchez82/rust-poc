@@ -5,13 +5,13 @@ use serde::{Deserialize, Serialize};
 
 #[sea_orm::model]
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, Serialize, Deserialize)]
-#[sea_orm(table_name = "post")]
+#[sea_orm(table_name = "session")]
 pub struct Model {
-    #[sea_orm(primary_key)]
-    pub id: i32,
-    pub title: String,
-    pub text: String,
+    #[sea_orm(primary_key, auto_increment = false)]
+    pub token: Uuid,
     pub user_id: i32,
+    pub expire_at: DateTimeWithTimeZone,
+    pub created_at: DateTimeWithTimeZone,
     #[sea_orm(
         belongs_to,
         from = "user_id",

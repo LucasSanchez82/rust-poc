@@ -2,5 +2,8 @@
 
 sea-orm-cli generate entity \
     -o src/modules/models/entities \
+    --entity-format dense \
     --with-serde both \
-    --lib
+    --lib # \
+    # --big-integer-type i64 \
+    

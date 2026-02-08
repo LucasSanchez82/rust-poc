@@ -1,18 +1,19 @@
 meta {
-  name: Delete user
+  name: login
   type: http
-  seq: 3
+  seq: 4
 }
 
-delete {
-  url: {{base_url}}/users
+post {
+  url: {{base_url}}/login
   body: json
   auth: inherit
 }
 
 body:json {
   {
-    "id": 4
+    "email": "tes2t@gmail.Com",
+    "password": "passwordForToto"
   }
 }
 

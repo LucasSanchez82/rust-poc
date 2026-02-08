@@ -1,5 +1,5 @@
 use sea_orm_migration::prelude::*;
-use sea_orm_migration::schema::{integer, pk_auto, string};
+use sea_orm_migration::schema::{integer, pk_auto, string, timestamp_with_time_zone, uuid};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -18,6 +18,24 @@ impl MigrationTrait for Migration {
                     .col(string("name"))
                     .col(string("email").unique_key())
                     .col(string("password"))
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_table(
+                Table::create()
+                    .table("session")
+                    .if_not_exists()
+                    .col(uuid("token").primary_key())
+                    .col(integer("user_id"))
+                    .col(timestamp_with_time_zone("expire_at"))
+                    .col(timestamp_with_time_zone("created_at"))
+                    .foreign_key(
+                        ForeignKey::create()
+                            .from("session", "user_id")
+                            .to("user", "id"),
+                    )
                     .to_owned(),
             )
             .await?;

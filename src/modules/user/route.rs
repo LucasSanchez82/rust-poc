@@ -5,8 +5,8 @@ use axum::{Json, Router};
 use crate::modules::responses::ApiError;
 use crate::modules::states::AppState;
 use crate::modules::types::ApiResponse;
-use crate::modules::user::dto::UserDto;
-use crate::modules::user::payload::{CreateUser, DeleteUser};
+use crate::modules::user::dto::{LoginDto, UserDto};
+use crate::modules::user::payload::{CreateUser, DeleteUser, LoginPayload};
 use crate::modules::user::service::{Service, UserService};
 
 pub fn user_router() -> Router<AppState> {
@@ -40,6 +40,19 @@ async fn handle_create_user(
     let user_svc = UserService::new(state.connection);
     user_svc
         .create(payload)
+        .await
+        .map(Json)
+        .map_err(ApiError::from)
+}
+
+pub async fn handle_login(
+    State(state): State<AppState>,
+    Json(payload): Json<LoginPayload>,
+) -> ApiResponse<LoginDto> {
+    let user_svc = UserService::new(state.connection);
+
+    user_svc
+        .login(payload)
         .await
         .map(Json)
         .map_err(ApiError::from)
