@@ -9,19 +9,12 @@ pub struct UserDto {
     pub email: String,
 }
 
-// TODO: TEST IF THAT POSSIBLE TO USE &str INSTEAD OF STRING using to_owned()
-impl From<&UserModel> for UserDto {
-    fn from(user: &UserModel) -> Self {
-        UserDto {
-            id: user.id,
-            name: user.name.to_owned(),
-            email: user.email.to_owned(),
-        }
-    }
-}
-
 impl From<UserModel> for UserDto {
     fn from(user: UserModel) -> Self {
-        UserDto::from(&user)
+        UserDto {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+        }
     }
 }

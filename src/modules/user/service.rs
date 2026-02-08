@@ -59,7 +59,7 @@ impl<'a> UserService<'a> {
             ServiceError::internal("Failed to fetch users").with_details(e.to_string())
         })?;
 
-        Ok(users.iter().map(UserDto::from).collect())
+        Ok(users.into_iter().map(UserDto::from).collect())
     }
 
     pub async fn get_one(&self, id: i32) -> ServiceResult<UserDto> {
