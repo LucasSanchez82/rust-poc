@@ -11,3 +11,9 @@ pub struct CreateUser {
 pub struct DeleteUser {
     pub id: i32,
 }
+
+#[derive(Deserialize)]
+pub struct LoginPayload {
+    pub email: String,
+    pub password: String,
+}

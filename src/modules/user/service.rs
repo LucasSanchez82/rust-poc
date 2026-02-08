@@ -4,17 +4,18 @@ use argon2::{
     Argon2,
     password_hash::{PasswordHasher, SaltString, rand_core::OsRng},
 };
+use rand::{Rng, distr::Alphanumeric};
 use sea_orm::DatabaseConnection;
 use sea_orm::EntityTrait;
 use sea_orm::{ActiveModelTrait, ActiveValue};
 use tracing::info;
 
-use crate::modules::errors::ServiceError;
 use crate::modules::models::entities::user::ActiveModel as UserActiveModel;
 use crate::modules::models::entities::user::Entity as UserEntity;
 use crate::modules::types::ServiceResult;
 use crate::modules::user::dto::UserDto;
 use crate::modules::user::payload::CreateUser;
+use crate::modules::{errors::ServiceError, user::payload::LoginPayload};
 
 pub struct UserService<'a> {
     db: Arc<DatabaseConnection>,
@@ -33,8 +34,37 @@ pub trait Service<T, P> {
 }
 
 impl<'a> UserService<'a> {
+    fn gen_token() -> String {
+        rand::rng()
+            .sample_iter(Alphanumeric)
+            .take(35)
+            .map(char::from)
+            .collect()
+    }
+
     fn argon2(&self) -> &Argon2<'a> {
         &self.argon2
+    }
+
+    fn login(&self, payload: LoginPayload) {
+        todo!()
+    }
+
+    async fn get_per_email(&self, id: i32) -> ServiceResult<UserDto> {
+        let user = UserEntity::find_by_email(id).one(self.db()).await;
+
+        match user {
+            Ok(user) => {
+                if let Some(user) = user {
+                    Ok(UserDto::from(user))
+                } else {
+                    Err(ServiceError::not_found(format!("The user with id {}", id)))
+                }
+            }
+            Err(err) => {
+                Err(ServiceError::internal("Failed to fetch users").with_details(err.to_string()))
+            }
+        }
     }
 }
 
@@ -103,11 +133,30 @@ impl<'a> Service<UserDto, CreateUser> for UserService<'a> {
             .into_boxed_slice())
     }
 
-    async fn get_one(&self, _id: i32) -> ServiceResult<UserDto> {
-        todo!()
+    async fn get_one(&self, id: i32) -> ServiceResult<UserDto> {
+        let user = UserEntity::find_by_id(id).one(self.db()).await;
+
+        match user {
+            Ok(user) => {
+                if let Some(user) = user {
+                    Ok(UserDto::from(user))
+                } else {
+                    Err(ServiceError::not_found(format!("The user with id {}", id)))
+                }
+            }
+            Err(err) => {
+                Err(ServiceError::internal("Failed to fetch users").with_details(err.to_string()))
+            }
+        }
     }
 
     async fn update(&self, _id: i32) -> ServiceResult<UserDto> {
         todo!()
     }
+}
+
+pub struct Claim {
+    pub exp: u64,
+    pub iat: u64,
+    pub email: String,
 }

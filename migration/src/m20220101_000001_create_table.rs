@@ -16,7 +16,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(pk_auto("id"))
                     .col(string("name"))
-                    .col(string("email"))
+                    .col(string("email").unique_key())
                     .col(string("password"))
                     .to_owned(),
             )
