@@ -1,3 +1,6 @@
+#[global_allocator]
+static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+
 use std::sync::Arc;
 
 use anyhow::Error;
@@ -26,7 +29,9 @@ async fn main() -> Result<(), Error> {
     let config = Config::new();
 
     info!("Trying to connect to database...");
-    let connection = Arc::new(sea_orm::Database::connect(config.database_url).await?);
+    let mut opt = sea_orm::ConnectOptions::new(config.database_url);
+    opt.max_connections(2).min_connections(1);
+    let connection = Arc::new(sea_orm::Database::connect(opt).await?);
     Migrator::up(connection.as_ref(), None).await?;
 
     let app_state = AppState { connection };

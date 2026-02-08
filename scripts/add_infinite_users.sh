@@ -1,0 +1,1 @@
+count=0; while true; do ((count++)) && curl -H "content-type: application/json" -X POST -d "{\"email\": \"incr${count}@test.com\", \"name\": \"test${count}\", \"password\": \"testhiohrfeiokrehm\"}" http://localhost:3000/users; done
