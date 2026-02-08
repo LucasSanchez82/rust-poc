@@ -25,8 +25,3 @@ impl From<UserModel> for UserDto {
         UserDto::from(&user)
     }
 }
-
-#[derive(Serialize)]
-pub struct LoginDto {
-    pub token: String,
-}

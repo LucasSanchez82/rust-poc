@@ -7,8 +7,8 @@ use axum::{Router, routing::get};
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
+use crate::modules::auth::route::handle_login;
 use crate::modules::states::AppState;
-use crate::modules::user::route::handle_login;
 use crate::modules::user::route::user_router;
 use crate::utils::cfg::Config;
 
@@ -20,12 +20,12 @@ async fn main() -> Result<(), Error> {
     use migration::{Migrator, MigratorTrait};
 
     tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::TRACE)
+        .with_max_level(tracing::Level::DEBUG)
         .init();
 
     let config = Config::new();
 
-    info!("Trying to connect to database... [{}]", config.database_url);
+    info!("Trying to connect to database...");
     let connection = Arc::new(sea_orm::Database::connect(config.database_url).await?);
     Migrator::up(connection.as_ref(), None).await?;
 
@@ -38,7 +38,6 @@ async fn main() -> Result<(), Error> {
         .with_state(app_state)
         .layer(TraceLayer::new_for_http());
 
-    // run our app with hyper, listening globally on port 3000
     let target = format!("{}:{}", config.host, config.port);
     let listener = tokio::net::TcpListener::bind(&target).await.unwrap();
 
