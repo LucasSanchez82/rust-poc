@@ -115,7 +115,7 @@ impl<'a> Service<UserDto, CreateUser> for UserService<'a> {
         let password_hash = self
             .argon2()
             .hash_password(payload.password.as_bytes(), &salt)
-            .unwrap()
+            .map_err(|err| ServiceError::internal("internal error").with_details(err.to_string()))?
             .to_string();
 
         let new_user = UserActiveModel {
@@ -184,10 +184,4 @@ impl<'a> Service<UserDto, CreateUser> for UserService<'a> {
     async fn update(&self, _id: i32) -> ServiceResult<UserDto> {
         todo!()
     }
-}
-
-pub struct Claim {
-    pub exp: u64,
-    pub iat: u64,
-    pub email: String,
 }

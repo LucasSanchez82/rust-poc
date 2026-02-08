@@ -6,7 +6,3 @@ use sea_orm::DatabaseConnection;
 pub struct AppState {
     pub connection: Arc<DatabaseConnection>,
 }
-
-pub struct ConnectionState {
-    pub connection: DatabaseConnection,
-}
