@@ -6,16 +6,11 @@ use crate::modules::{
 };
 
 use axum::{
-    Json,
     extract::FromRequestParts,
     http::request::Parts,
 };
 
-pub struct AuthState {
-    user: Option<UserDto>,
-}
-
-pub struct ExtractAuthInfos(UserDto);
+pub struct ExtractAuthInfos(pub UserDto);
 
 impl FromRequestParts<AppState> for ExtractAuthInfos {
     type Rejection = (StatusCode, String);
@@ -24,32 +19,25 @@ impl FromRequestParts<AppState> for ExtractAuthInfos {
         parts: &mut Parts,
         app_state: &AppState,
     ) -> Result<Self, Self::Rejection> {
-        if let Some(authorization) = parts.headers.get(AUTHORIZATION) {
-            let dbg = authorization.to_str();
-            match dbg {
-                Err(_) => Err((
-                    StatusCode::BAD_REQUEST,
-                    "`authorization` header is malformated".to_owned(),
-                )),
-                Ok(auth_str) => {
-                    let token = auth_str.replace("Bearer ", "");
+        let authorization = parts
+            .headers
+            .get(AUTHORIZATION)
+            .ok_or((StatusCode::UNAUTHORIZED, "`authorization` header is missing".to_owned()))?;
 
-                    let session_service = SessionService::new(&app_state.connection);
-                    let session = session_service.get_with_user(token.as_str()).await?;
-                    session.user
-                        .ok_or((StatusCode::BAD_REQUEST, "The related session has no linked user".to_owned()))
-                        .map(ExtractAuthInfos)
-                }
-            }
-        } else {
-            Err((
-                StatusCode::BAD_REQUEST,
-                "`authorization` header is missing".to_owned(),
-            ))
-        }
+        let auth_str = authorization.to_str().map_err(|_| {
+            (StatusCode::UNAUTHORIZED, "`authorization` header is malformed".to_owned())
+        })?;
+
+        let token = auth_str
+            .strip_prefix("Bearer ")
+            .ok_or((StatusCode::UNAUTHORIZED, "Invalid authorization scheme".to_owned()))?;
+
+        let session_service = SessionService::new(&app_state.connection);
+        let session = session_service.get_with_user(token).await?;
+
+        session
+            .user
+            .ok_or((StatusCode::UNAUTHORIZED, "The related session has no linked user".to_owned()))
+            .map(ExtractAuthInfos)
     }
-}
-
-pub async fn test_handler(ExtractAuthInfos(user): ExtractAuthInfos) -> Json<UserDto> {
-    Json(user)
 }

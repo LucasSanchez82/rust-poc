@@ -10,7 +10,6 @@ use axum::{Router, routing::get};
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
-use crate::modules::auth::middleware::test_handler;
 use crate::modules::auth::route::handle_login;
 use crate::modules::states::AppState;
 use crate::modules::user::route::user_router;
@@ -40,7 +39,6 @@ async fn main() -> Result<(), Error> {
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
         .route("/login", post(handle_login))
-        .route("/test", get(test_handler))
         .nest("/users", user_router())
         .with_state(app_state)
         .layer(TraceLayer::new_for_http());

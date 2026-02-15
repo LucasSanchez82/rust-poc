@@ -2,13 +2,19 @@ use axum::Json;
 use axum::extract::State;
 use validator::Validate;
 
+use crate::modules::auth::middleware::ExtractAuthInfos;
 use crate::modules::auth::service::AuthService;
 use crate::modules::errors::ServiceError;
 use crate::modules::responses::ApiError;
 use crate::modules::session::dto::SessionDTO;
 use crate::modules::states::AppState;
 use crate::modules::types::ApiResponse;
+use crate::modules::user::dto::UserDto;
 use crate::modules::user::payload::LoginPayload;
+
+pub async fn handle_me(ExtractAuthInfos(user): ExtractAuthInfos) -> Json<UserDto> {
+    Json(user)
+}
 
 pub async fn handle_login(
     State(state): State<AppState>,
