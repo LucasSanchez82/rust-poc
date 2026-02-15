@@ -17,6 +17,11 @@ body:json {
   }
 }
 
+script:post-response {
+  let data = res.body;
+  bru.setVar("auth_token", data.token);
+}
+
 settings {
   encodeUrl: true
   timeout: 0

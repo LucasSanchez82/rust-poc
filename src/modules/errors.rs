@@ -1,4 +1,6 @@
+use anyhow::Error;
 use axum::http::StatusCode;
+use migration::extension::postgres::PgExpr;
 
 #[derive(Debug)]
 pub struct ServiceError {
@@ -32,6 +34,10 @@ impl ServiceError {
     pub fn unauthorized(message: impl Into<String>) -> Self {
         Self::new(StatusCode::UNAUTHORIZED, message)
     }
+
+    pub fn bad_request(message: impl Into<String>) -> Self {
+        Self::new(StatusCode::BAD_REQUEST, message)
+    }
 }
 
 impl std::fmt::Display for ServiceError {
@@ -41,3 +47,9 @@ impl std::fmt::Display for ServiceError {
 }
 
 impl std::error::Error for ServiceError {}
+
+impl From<ServiceError> for (StatusCode, String) {
+    fn from(err: ServiceError) -> Self {
+        (err.status, err.message)
+    }
+}

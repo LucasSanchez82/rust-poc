@@ -2,18 +2,15 @@
 static GLOBAL: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
 
 use std::sync::Arc;
-use std::sync::atomic::AtomicU64;
 
 use anyhow::Error;
 use anyhow::Result;
-use axum::Extension;
-use axum::middleware;
 use axum::routing::post;
 use axum::{Router, routing::get};
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
-use crate::modules::auth::middleware::print_request_response;
+use crate::modules::auth::middleware::test_handler;
 use crate::modules::auth::route::handle_login;
 use crate::modules::states::AppState;
 use crate::modules::user::route::user_router;
@@ -39,18 +36,14 @@ async fn main() -> Result<(), Error> {
     Migrator::up(connection.as_ref(), None).await?;
 
     let app_state = AppState { connection };
-    let counter = Arc::new(AtomicU64::new(0));
 
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
         .route("/login", post(handle_login))
+        .route("/test", get(test_handler))
         .nest("/users", user_router())
         .with_state(app_state)
-        .layer(TraceLayer::new_for_http())
-        .layer(middleware::from_fn_with_state(
-            counter,
-            print_request_response,
-        ));
+        .layer(TraceLayer::new_for_http());
 
     let target = format!("{}:{}", config.host, config.port);
     let listener = tokio::net::TcpListener::bind(&target).await.unwrap();
