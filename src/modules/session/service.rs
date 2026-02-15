@@ -4,7 +4,7 @@ use crate::modules::models::entities::session::Entity as SessionEntity;
 use crate::modules::models::entities::user::Entity as UserEntity;
 
 use crate::modules::errors::ServiceError;
-use crate::modules::session::dto::SessionDTO;
+use crate::modules::session::dto::SessionTokenDTO;
 use crate::modules::session::dto::SessionUserDTO;
 use crate::modules::types::ServiceResult;
 use chrono::{Duration, Utc};
@@ -23,7 +23,7 @@ impl<'a> SessionService<'a> {
         Self { db }
     }
 
-    pub async fn create(&self, user_id: i32) -> ServiceResult<SessionDTO> {
+    pub async fn create(&self, user_id: i32) -> ServiceResult<SessionTokenDTO> {
         let token = Uuid::new_v4();
         let created_at = Utc::now();
         let expire_at = created_at + Duration::hours(720);
@@ -38,7 +38,7 @@ impl<'a> SessionService<'a> {
         session_entity
             .insert(self.db)
             .await
-            .map(SessionDTO::from)
+            .map(SessionTokenDTO::from)
             .map_err(|err| {
                 let msg = "Internal error during the creation of the session";
                 error!("message: {}\ndetails: {}", msg, err);

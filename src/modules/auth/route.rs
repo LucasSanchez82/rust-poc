@@ -6,7 +6,7 @@ use crate::modules::auth::middleware::ExtractAuthInfos;
 use crate::modules::auth::service::AuthService;
 use crate::modules::errors::ServiceError;
 use crate::modules::responses::ApiError;
-use crate::modules::session::dto::SessionDTO;
+use crate::modules::session::dto::SessionTokenDTO;
 use crate::modules::states::AppState;
 use crate::modules::types::ApiResponse;
 use crate::modules::user::dto::UserDto;
@@ -19,7 +19,7 @@ pub async fn handle_me(ExtractAuthInfos(user): ExtractAuthInfos) -> Json<UserDto
 pub async fn handle_login(
     State(state): State<AppState>,
     Json(payload): Json<LoginPayload>,
-) -> ApiResponse<SessionDTO> {
+) -> ApiResponse<SessionTokenDTO> {
     payload.validate().map_err(|e| {
         ApiError::from(
             ServiceError::new(axum::http::StatusCode::BAD_REQUEST, "Validation error")

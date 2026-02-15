@@ -3,7 +3,7 @@ use sea_orm::DatabaseConnection;
 use tracing::error;
 
 use crate::modules::errors::ServiceError;
-use crate::modules::session::dto::SessionDTO;
+use crate::modules::session::dto::SessionTokenDTO;
 use crate::modules::session::service::SessionService;
 use crate::modules::types::ServiceResult;
 use crate::modules::user::payload::LoginPayload;
@@ -18,7 +18,7 @@ impl<'a> AuthService<'a> {
         Self { db }
     }
 
-    pub async fn login(&self, payload: LoginPayload) -> ServiceResult<SessionDTO> {
+    pub async fn login(&self, payload: LoginPayload) -> ServiceResult<SessionTokenDTO> {
         let user_svc = UserService::new(self.db);
         let user = user_svc.get_per_email_model(&payload.email).await?;
 
