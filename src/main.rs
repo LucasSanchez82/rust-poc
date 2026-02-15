@@ -11,6 +11,7 @@ use tower_http::trace::TraceLayer;
 use tracing::info;
 
 use crate::modules::auth::route::handle_login;
+use crate::modules::auth::route::handle_me;
 use crate::modules::states::AppState;
 use crate::modules::user::route::user_router;
 use crate::utils::cfg::Config;
@@ -39,6 +40,7 @@ async fn main() -> Result<(), Error> {
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
         .route("/login", post(handle_login))
+        .route("/me", post(handle_me))
         .nest("/users", user_router())
         .with_state(app_state)
         .layer(TraceLayer::new_for_http());
