@@ -1,32 +1,15 @@
-use std::sync::{
-    Arc,
-    atomic::{AtomicU64, Ordering},
-};
 
-use axum::{
-    Extension,
-    body::{Body, Bytes},
-    extract::{Request, State},
-    http::{self, StatusCode, header::AUTHORIZATION},
-    middleware::Next,
-    response::{IntoResponse, Response},
-};
-use http_body_util::BodyExt;
-use tracing::debug;
+use axum::http::{StatusCode, header::AUTHORIZATION};
 
 use crate::modules::{
-    responses::ApiError, session::service::SessionService, states::AppState, user::dto::UserDto,
+    session::service::SessionService, states::AppState, user::dto::UserDto,
 };
 
 use axum::{
     Json,
     extract::FromRequestParts,
-    http::{
-        header::{HeaderValue, USER_AGENT},
-        request::Parts,
-    },
+    http::request::Parts,
 };
-use serde::{Deserialize, Serialize};
 
 pub struct AuthState {
     user: Option<UserDto>,
