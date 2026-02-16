@@ -29,29 +29,12 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(uuid("token").primary_key())
                     .col(integer("user_id"))
+                    .col(timestamp_with_time_zone("revokated_at"))
                     .col(timestamp_with_time_zone("expire_at"))
                     .col(timestamp_with_time_zone("created_at"))
                     .foreign_key(
                         ForeignKey::create()
                             .from("session", "user_id")
-                            .to("user", "id"),
-                    )
-                    .to_owned(),
-            )
-            .await?;
-
-        manager
-            .create_table(
-                Table::create()
-                    .table("post")
-                    .if_not_exists()
-                    .col(pk_auto("id"))
-                    .col(string("title"))
-                    .col(string("text"))
-                    .col(integer("user_id"))
-                    .foreign_key(
-                        ForeignKey::create()
-                            .from("post", "user_id")
                             .to("user", "id"),
                     )
                     .to_owned(),

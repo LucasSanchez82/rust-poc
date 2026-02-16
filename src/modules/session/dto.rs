@@ -36,6 +36,6 @@ impl From<(SessionModel, Option<UserModel>)> for SessionUserDTO {
 
 impl SessionUserDTO {
     pub fn is_valid(&self) -> bool {
-        Utc::now() > self.expire_at
+        Utc::now() < self.expire_at
     }
 }

@@ -22,18 +22,26 @@ impl<'a> AuthService<'a> {
         let user_svc = UserService::new(self.db);
         let user = user_svc.get_per_email_model(&payload.email).await?;
 
-        let hash = PasswordHash::new(&user.password).map_err(|err| {
-            let err_msg = format!(
-                "Error, the hash of the user with email: '{}' is not valid",
-                payload.email
-            );
-            error!("{}", err_msg);
-            ServiceError::internal(err_msg).with_details(err.to_string())
-        })?;
+        let password = payload.password;
+        let password_hash = user.password;
+        let email = payload.email;
 
-        Argon2::default()
-            .verify_password(payload.password.as_bytes(), &hash)
-            .map_err(|_| ServiceError::unauthorized("Bad password"))?;
+        tokio::task::spawn_blocking(move || {
+            let hash = PasswordHash::new(&password_hash).map_err(|err| {
+                let err_msg = format!(
+                    "Error, the hash of the user with email: '{}' is not valid",
+                    email
+                );
+                error!("{}", err_msg);
+                ServiceError::internal(err_msg).with_details(err.to_string())
+            })?;
+
+            Argon2::default()
+                .verify_password(password.as_bytes(), &hash)
+                .map_err(|_| ServiceError::unauthorized("Bad password"))
+        })
+        .await
+        .map_err(|_| ServiceError::internal("Password verification task failed"))??;
 
         let session_svc = SessionService::new(self.db);
         session_svc.create(user.id).await
