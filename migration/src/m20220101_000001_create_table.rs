@@ -1,5 +1,7 @@
 use sea_orm_migration::prelude::*;
-use sea_orm_migration::schema::{integer, pk_auto, string, timestamp_with_time_zone, uuid};
+use sea_orm_migration::schema::{
+    integer, pk_auto, string, timestamp_with_time_zone, timestamp_with_time_zone_null, uuid,
+};
 
 #[derive(DeriveMigrationName)]
 pub struct Migration;
@@ -29,7 +31,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(uuid("token").primary_key())
                     .col(integer("user_id"))
-                    .col(timestamp_with_time_zone("revokated_at"))
+                    .col(timestamp_with_time_zone_null("revokated_at"))
                     .col(timestamp_with_time_zone("expire_at"))
                     .col(timestamp_with_time_zone("created_at"))
                     .foreign_key(

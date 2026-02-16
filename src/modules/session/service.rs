@@ -8,6 +8,7 @@ use crate::modules::session::dto::SessionTokenDTO;
 use crate::modules::session::dto::SessionUserDTO;
 use crate::modules::types::ServiceResult;
 use chrono::{Duration, Utc};
+use sea_orm::ActiveValue::NotSet;
 use sea_orm::ActiveValue::Set;
 use sea_orm::EntityTrait;
 use sea_orm::{ActiveModelTrait, DatabaseConnection};
@@ -31,6 +32,7 @@ impl<'a> SessionService<'a> {
         let session_entity = SessionActiveModel {
             token: Set(token),
             user_id: Set(user_id),
+            revokated_at: NotSet,
             created_at: Set(created_at.into()),
             expire_at: Set(expire_at.into()),
         };

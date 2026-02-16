@@ -1,4 +1,4 @@
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, Utc};
 use serde::Serialize;
 
 use crate::modules::models::entities::session::Model as SessionModel;
@@ -20,6 +20,7 @@ impl From<SessionModel> for SessionTokenDTO {
 #[derive(Serialize)]
 pub struct SessionUserDTO {
     pub token: String,
+    pub revoked_at: Option<DateTime<Utc>>,
     pub expire_at: DateTime<Utc>,
     pub user: Option<UserDto>,
 }
@@ -28,6 +29,7 @@ impl From<(SessionModel, Option<UserModel>)> for SessionUserDTO {
     fn from((session, user): (SessionModel, Option<UserModel>)) -> Self {
         Self {
             token: session.token.to_string(),
+            revoked_at: None,
             expire_at: session.expire_at.to_utc(),
             user: user.map(UserDto::from),
         }
@@ -36,6 +38,6 @@ impl From<(SessionModel, Option<UserModel>)> for SessionUserDTO {
 
 impl SessionUserDTO {
     pub fn is_valid(&self) -> bool {
-        Utc::now() < self.expire_at
+        (Utc::now() < self.expire_at) && self.revoked_at.is_some()
     }
 }
