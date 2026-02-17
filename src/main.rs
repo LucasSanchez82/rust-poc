@@ -5,15 +5,11 @@ use std::sync::Arc;
 
 use anyhow::Error;
 use anyhow::Result;
-use axum::routing::post;
 use axum::{Router, routing::get};
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
 use crate::modules::auth::route::auth_router;
-use crate::modules::auth::route::handle_login;
-use crate::modules::auth::route::handle_logout;
-use crate::modules::auth::route::handle_me;
 use crate::modules::states::AppState;
 use crate::modules::user::route::user_router;
 use crate::utils::cfg::Config;
