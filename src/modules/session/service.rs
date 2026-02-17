@@ -1,4 +1,7 @@
+use std::str::FromStr;
+
 use crate::modules::models::entities::session::ActiveModel as SessionActiveModel;
+use crate::modules::models::entities::session::Column as SessionColumn;
 use crate::modules::models::entities::session::Entity as SessionEntity;
 
 use crate::modules::models::entities::user::Entity as UserEntity;
@@ -8,9 +11,12 @@ use crate::modules::session::dto::SessionTokenDTO;
 use crate::modules::session::dto::SessionUserDTO;
 use crate::modules::types::ServiceResult;
 use chrono::{Duration, Utc};
+use migration::Expr;
 use sea_orm::ActiveValue::NotSet;
 use sea_orm::ActiveValue::Set;
+use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
+use sea_orm::QueryFilter;
 use sea_orm::{ActiveModelTrait, DatabaseConnection};
 use tracing::error;
 use uuid::Uuid;
@@ -78,5 +84,25 @@ impl<'a> SessionService<'a> {
                 }
             }
         }
+    }
+
+    pub async fn revoke_token(&self, id: String) -> ServiceResult<SessionTokenDTO> {
+        let token_uuid = Uuid::from_str(id.as_str())
+            .map_err(|_error| ServiceError::bad_request("The given token is malformated"))?;
+
+        let result = SessionEntity::update_many()
+            .col_expr(
+                SessionColumn::RevokatedAt,
+                Expr::value(Utc::now().fixed_offset()),
+            )
+            .filter(SessionColumn::Token.eq(token_uuid))
+            .exec(self.db)
+            .await?;
+
+        if result.rows_affected == 0 {
+            return Err(ServiceError::bad_request("No session founded"));
+        }
+
+        Ok(SessionTokenDTO { token: id })
     }
 }

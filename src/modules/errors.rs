@@ -1,4 +1,6 @@
 use axum::http::StatusCode;
+use sea_orm::DbErr;
+use tracing::warn;
 
 #[derive(Debug)]
 pub struct ServiceError {
@@ -49,5 +51,12 @@ impl std::error::Error for ServiceError {}
 impl From<ServiceError> for (StatusCode, String) {
     fn from(err: ServiceError) -> Self {
         (err.status, err.message)
+    }
+}
+
+impl From<DbErr> for ServiceError {
+    fn from(value: DbErr) -> Self {
+        warn!("DB ERROR: {:#?}", value);
+        Self::internal("Internal Error during the processing of your request...")
     }
 }

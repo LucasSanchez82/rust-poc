@@ -3,6 +3,7 @@ use serde::Serialize;
 
 use crate::modules::models::entities::session::Model as SessionModel;
 use crate::modules::models::entities::user::Model as UserModel;
+use crate::modules::types::ServiceResult;
 use crate::modules::user::dto::UserDto;
 
 #[derive(Serialize)]
@@ -40,4 +41,9 @@ impl SessionUserDTO {
     pub fn is_valid(&self) -> bool {
         (Utc::now() < self.expire_at) && self.revoked_at.is_some()
     }
+}
+
+#[derive(Serialize)]
+pub struct LogoutSuccessDTO {
+    message: String,
 }

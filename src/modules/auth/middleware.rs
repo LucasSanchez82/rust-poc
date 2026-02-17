@@ -1,12 +1,14 @@
+use std::sync::Arc;
+
 use axum::http::{StatusCode, header::AUTHORIZATION};
 
 use crate::modules::{
-    responses::ApiError, session::service::SessionService, states::AppState, user::dto::UserDto,
+    auth::dto::AuthSession, responses::ApiError, session::service::SessionService, states::AppState,
 };
 
 use axum::{extract::FromRequestParts, http::request::Parts};
 
-pub struct ExtractAuthInfos(pub UserDto);
+pub struct ExtractAuthInfos(pub AuthSession);
 
 impl FromRequestParts<AppState> for ExtractAuthInfos {
     type Rejection = ApiError;
@@ -34,9 +36,10 @@ impl FromRequestParts<AppState> for ExtractAuthInfos {
             "Invalid authorization scheme".to_owned(),
             None,
         ))?;
+        let token: Box<str> = Box::from(&*token);
 
         let session_service = SessionService::new(&app_state.connection);
-        let session = session_service.get_with_user(token).await?;
+        let session = session_service.get_with_user(&token).await?;
 
         if !session.is_valid() {
             return Err(ApiError::new(
@@ -53,6 +56,11 @@ impl FromRequestParts<AppState> for ExtractAuthInfos {
                 "The related session has no linked user".to_owned(),
                 None,
             ))
-            .map(ExtractAuthInfos)
+            .map(|user_dto| {
+                ExtractAuthInfos(AuthSession {
+                    user: user_dto,
+                    session_token: token,
+                })
+            })
     }
 }
