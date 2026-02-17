@@ -1,8 +1,6 @@
-use std::sync::Arc;
 
-use sea_orm::DatabaseConnection;
 
-use crate::modules::{session::dto::SessionTokenDTO, user::dto::UserDto};
+use crate::modules::user::dto::UserDto;
 
 pub struct AuthSession {
     pub user: UserDto,

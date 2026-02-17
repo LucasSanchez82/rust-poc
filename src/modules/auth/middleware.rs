@@ -1,4 +1,3 @@
-use std::sync::Arc;
 
 use axum::http::{StatusCode, header::AUTHORIZATION};
 
@@ -36,7 +35,7 @@ impl FromRequestParts<AppState> for ExtractAuthInfos {
             "Invalid authorization scheme".to_owned(),
             None,
         ))?;
-        let token: Box<str> = Box::from(&*token);
+        let token: Box<str> = Box::from(token);
 
         let session_service = SessionService::new(&app_state.connection);
         let session = session_service.get_with_user(&token).await?;

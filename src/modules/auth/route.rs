@@ -1,6 +1,5 @@
 use axum::extract::State;
-use axum::http::{HeaderMap, HeaderName, HeaderValue, header};
-use axum::{Json, extract};
+use axum::Json;
 use validator::Validate;
 
 use crate::modules::auth::middleware::ExtractAuthInfos;
@@ -10,7 +9,7 @@ use crate::modules::responses::ApiError;
 use crate::modules::session::dto::SessionTokenDTO;
 use crate::modules::session::service::SessionService;
 use crate::modules::states::AppState;
-use crate::modules::types::{ApiResponse, ServiceResult};
+use crate::modules::types::ApiResponse;
 use crate::modules::user::dto::UserDto;
 use crate::modules::user::payload::LoginPayload;
 

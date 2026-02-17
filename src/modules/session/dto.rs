@@ -3,7 +3,6 @@ use serde::Serialize;
 
 use crate::modules::models::entities::session::Model as SessionModel;
 use crate::modules::models::entities::user::Model as UserModel;
-use crate::modules::types::ServiceResult;
 use crate::modules::user::dto::UserDto;
 
 #[derive(Serialize)]
