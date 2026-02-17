@@ -1,15 +1,16 @@
 meta {
-  name: test
+  name: logout
   type: http
-  seq: 5
+  seq: 6
 }
 
-get {
-  url: {{base_url}}/test
+post {
+  url: {{base_url}}/logout
   body: none
   auth: inherit
 }
 
 settings {
   encodeUrl: true
+  timeout: 0
 }

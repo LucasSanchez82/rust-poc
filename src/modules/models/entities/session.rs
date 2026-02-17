@@ -10,7 +10,7 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub token: Uuid,
     pub user_id: i32,
-    pub revokated_at: DateTimeWithTimeZone,
+    pub revokated_at: Option<DateTimeWithTimeZone>,
     pub expire_at: DateTimeWithTimeZone,
     pub created_at: DateTimeWithTimeZone,
     #[sea_orm(

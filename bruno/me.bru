@@ -1,0 +1,20 @@
+meta {
+  name: me
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/me
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{auth_token}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

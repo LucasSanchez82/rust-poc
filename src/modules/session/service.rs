@@ -18,7 +18,9 @@ use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
 use sea_orm::QueryFilter;
 use sea_orm::{ActiveModelTrait, DatabaseConnection};
+use tower_http::trace;
 use tracing::error;
+use tracing::trace;
 use uuid::Uuid;
 
 pub struct SessionService<'a> {
@@ -71,6 +73,7 @@ impl<'a> SessionService<'a> {
                     Ok(session_user) => match session_user {
                         Some(session_user) => {
                             let session_user_dto = SessionUserDTO::from(session_user);
+                            trace!("session: {:#?}", session_user_dto);
                             Ok(session_user_dto)
                         }
                         None => Err(ServiceError::internal(

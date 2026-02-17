@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::modules::models::entities::user::Model as UserModel;
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct UserDto {
     pub id: i32,
     pub name: String,

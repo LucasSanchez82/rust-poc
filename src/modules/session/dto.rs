@@ -1,5 +1,7 @@
 use chrono::{DateTime, Utc};
+use migration::prelude::time::UtcDateTime;
 use serde::Serialize;
+use tracing::trace;
 
 use crate::modules::models::entities::session::Model as SessionModel;
 use crate::modules::models::entities::user::Model as UserModel;
@@ -17,7 +19,7 @@ impl From<SessionModel> for SessionTokenDTO {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct SessionUserDTO {
     pub token: String,
     pub revoked_at: Option<DateTime<Utc>>,
@@ -29,7 +31,7 @@ impl From<(SessionModel, Option<UserModel>)> for SessionUserDTO {
     fn from((session, user): (SessionModel, Option<UserModel>)) -> Self {
         Self {
             token: session.token.to_string(),
-            revoked_at: None,
+            revoked_at: session.revokated_at.map(|dt| dt.to_utc()),
             expire_at: session.expire_at.to_utc(),
             user: user.map(UserDto::from),
         }
@@ -38,7 +40,9 @@ impl From<(SessionModel, Option<UserModel>)> for SessionUserDTO {
 
 impl SessionUserDTO {
     pub fn is_valid(&self) -> bool {
-        (Utc::now() < self.expire_at) && self.revoked_at.is_some()
+        trace!("Revoked at : {:#?}", self.revoked_at.is_some());
+        trace!("Revoked is some : {:#?}", self.revoked_at);
+        (Utc::now() < self.expire_at) && !self.revoked_at.is_some()
     }
 }
 
