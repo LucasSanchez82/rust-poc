@@ -8,7 +8,7 @@ use crate::modules::models::entities::user::Entity as UserEntity;
 
 use crate::modules::errors::ServiceError;
 use crate::modules::session::dto::SessionTokenDTO;
-use crate::modules::session::dto::SessionUserDTO;
+use crate::modules::session::domain::SessionWithUser;
 use crate::modules::types::ServiceResult;
 use chrono::{Duration, Utc};
 use migration::Expr;
@@ -55,7 +55,7 @@ impl<'a> SessionService<'a> {
             })
     }
 
-    pub async fn get_with_user(&self, token: &str) -> ServiceResult<SessionUserDTO> {
+    pub async fn get_with_user(&self, token: &str) -> ServiceResult<SessionWithUser> {
         let token = Uuid::parse_str(token);
         match token {
             Err(err) => Err(
@@ -71,7 +71,7 @@ impl<'a> SessionService<'a> {
                 match session_user {
                     Ok(session_user) => match session_user {
                         Some(session_user) => {
-                            let session_user_dto = SessionUserDTO::from(session_user);
+                            let session_user_dto = SessionWithUser::from(session_user);
                             trace!("session: {:#?}", session_user_dto);
                             Ok(session_user_dto)
                         }
