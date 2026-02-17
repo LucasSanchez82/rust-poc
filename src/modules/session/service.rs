@@ -18,7 +18,6 @@ use sea_orm::ColumnTrait;
 use sea_orm::EntityTrait;
 use sea_orm::QueryFilter;
 use sea_orm::{ActiveModelTrait, DatabaseConnection};
-use tower_http::trace;
 use tracing::error;
 use tracing::trace;
 use uuid::Uuid;

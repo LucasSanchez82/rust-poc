@@ -1,5 +1,4 @@
 use chrono::{DateTime, Utc};
-use migration::prelude::time::UtcDateTime;
 use serde::Serialize;
 use tracing::trace;
 
@@ -42,7 +41,7 @@ impl SessionUserDTO {
     pub fn is_valid(&self) -> bool {
         trace!("Revoked at : {:#?}", self.revoked_at.is_some());
         trace!("Revoked is some : {:#?}", self.revoked_at);
-        (Utc::now() < self.expire_at) && !self.revoked_at.is_some()
+        (Utc::now() < self.expire_at) && self.revoked_at.is_none()
     }
 }
 
