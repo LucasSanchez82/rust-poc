@@ -2,13 +2,14 @@ use argon2::{
     Argon2,
     password_hash::{PasswordHasher, SaltString, rand_core::OsRng},
 };
-use sea_orm::DatabaseConnection;
+use axum::extract::State;
 use sea_orm::EntityTrait;
 use sea_orm::{ActiveModelTrait, ActiveValue};
+use sea_orm::{DatabaseConnection, PaginatorTrait};
 
-use crate::modules::models::entities::user::ActiveModel as UserActiveModel;
 use crate::modules::models::entities::user::Entity as UserEntity;
 use crate::modules::models::entities::user::Model as UserModel;
+use crate::modules::{models::entities::user::ActiveModel as UserActiveModel, states::AppState};
 
 use crate::modules::errors::ServiceError;
 use crate::modules::types::ServiceResult;
@@ -52,6 +53,20 @@ impl<'a> UserService<'a> {
             name: created_user.name,
             email: created_user.email,
         })
+    }
+
+    pub async fn create_initial_root_user(&self, payload: CreateUser) -> ServiceResult<UserDto> {
+        let users_count = self.get_activated_users_count().await?;
+
+        if users_count < 1 {
+            Err(ServiceError::not_found("No longer available"))
+        } else {
+            Ok(self.create(payload).await?)
+        }
+    }
+
+    pub async fn get_activated_users_count(&self) -> ServiceResult<u64> {
+        UserEntity::find().count(self.db).await.map(Ok)?
     }
 
     pub async fn get_all(&self) -> ServiceResult<Vec<UserDto>> {

@@ -4,6 +4,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::Serialize;
+use validator::{ValidationError, ValidationErrors};
 
 use crate::modules::errors::ServiceError;
 
@@ -38,5 +39,15 @@ impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
         let status = StatusCode::from_u16(self.status).unwrap_or_default();
         (status, Json(self)).into_response()
+    }
+}
+
+impl From<ValidationErrors> for ApiError {
+    fn from(error: ValidationErrors) -> Self {
+        Self {
+            details: Some(error.to_string()),
+            error: "The request body is malformated".to_string(),
+            status: StatusCode::NOT_FOUND.as_u16(),
+        }
     }
 }

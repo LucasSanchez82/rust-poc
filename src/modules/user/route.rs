@@ -14,8 +14,22 @@ use crate::modules::user::service::UserService;
 pub fn user_router() -> Router<AppState> {
     Router::new()
         .route("/", get(handle_get_users))
+        .route("/", get(handle_create_initial_root_user))
         .route("/", post(handle_create_user))
         .route("/{id}", delete(handle_delete_user))
+}
+
+async fn handle_create_initial_root_user(
+    state: State<AppState>,
+    Json(payload): Json<CreateUser>,
+) -> ApiResponse<UserDto> {
+    let user_svc = UserService::new(&state.connection);
+    payload.validate()?;
+    user_svc
+        .create_initial_root_user(payload)
+        .await
+        .map(Json)
+        .map_err(ApiError::from)
 }
 
 async fn handle_get_users(State(state): State<AppState>) -> ApiResponse<Vec<UserDto>> {
@@ -28,11 +42,7 @@ async fn handle_delete_user(
     Path(id): Path<i32>,
 ) -> ApiResponse<UserDto> {
     let user_svc = UserService::new(&state.connection);
-    user_svc
-        .delete(id)
-        .await
-        .map(Json)
-        .map_err(ApiError::from)
+    user_svc.delete(id).await.map(Json).map_err(ApiError::from)
 }
 
 async fn handle_create_user(

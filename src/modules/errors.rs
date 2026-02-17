@@ -1,6 +1,9 @@
+use std::error::Error;
+
 use axum::http::StatusCode;
 use sea_orm::DbErr;
 use tracing::warn;
+use validator::ValidationError;
 
 #[derive(Debug)]
 pub struct ServiceError {
