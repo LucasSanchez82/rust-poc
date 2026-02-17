@@ -2,14 +2,13 @@ use argon2::{
     Argon2,
     password_hash::{PasswordHasher, SaltString, rand_core::OsRng},
 };
-use axum::extract::State;
 use sea_orm::EntityTrait;
 use sea_orm::{ActiveModelTrait, ActiveValue};
 use sea_orm::{DatabaseConnection, PaginatorTrait};
 
 use crate::modules::models::entities::user::Entity as UserEntity;
 use crate::modules::models::entities::user::Model as UserModel;
-use crate::modules::{models::entities::user::ActiveModel as UserActiveModel, states::AppState};
+use crate::modules::models::entities::user::ActiveModel as UserActiveModel;
 
 use crate::modules::errors::ServiceError;
 use crate::modules::types::ServiceResult;

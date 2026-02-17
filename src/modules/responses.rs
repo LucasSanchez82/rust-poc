@@ -4,7 +4,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use serde::Serialize;
-use validator::{ValidationError, ValidationErrors};
+use validator::ValidationErrors;
 
 use crate::modules::errors::ServiceError;
 
