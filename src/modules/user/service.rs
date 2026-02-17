@@ -6,9 +6,9 @@ use sea_orm::EntityTrait;
 use sea_orm::{ActiveModelTrait, ActiveValue};
 use sea_orm::{DatabaseConnection, PaginatorTrait};
 
+use crate::modules::models::entities::user::ActiveModel as UserActiveModel;
 use crate::modules::models::entities::user::Entity as UserEntity;
 use crate::modules::models::entities::user::Model as UserModel;
-use crate::modules::models::entities::user::ActiveModel as UserActiveModel;
 
 use crate::modules::errors::ServiceError;
 use crate::modules::types::ServiceResult;
@@ -57,7 +57,7 @@ impl<'a> UserService<'a> {
     pub async fn create_initial_root_user(&self, payload: CreateUser) -> ServiceResult<UserDto> {
         let users_count = self.get_activated_users_count().await?;
 
-        if users_count < 1 {
+        if users_count > 0 {
             Err(ServiceError::not_found("No longer available"))
         } else {
             Ok(self.create(payload).await?)

@@ -14,8 +14,8 @@ use crate::modules::user::service::UserService;
 pub fn user_router() -> Router<AppState> {
     Router::new()
         .route("/", get(handle_get_users))
-        .route("/", get(handle_create_initial_root_user))
         .route("/", post(handle_create_user))
+        .route("/initial_root_user", post(handle_create_initial_root_user))
         .route("/{id}", delete(handle_delete_user))
 }
 
