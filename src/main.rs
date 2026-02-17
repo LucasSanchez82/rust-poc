@@ -10,6 +10,7 @@ use axum::{Router, routing::get};
 use tower_http::trace::TraceLayer;
 use tracing::info;
 
+use crate::modules::auth::route::auth_router;
 use crate::modules::auth::route::handle_login;
 use crate::modules::auth::route::handle_logout;
 use crate::modules::auth::route::handle_me;
@@ -24,11 +25,11 @@ pub mod utils;
 async fn main() -> Result<(), Error> {
     use migration::{Migrator, MigratorTrait};
 
-    tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::TRACE)
-        .init();
-
     let config = Config::new();
+
+    tracing_subscriber::fmt()
+        .with_max_level(config.log_level)
+        .init();
 
     info!("Trying to connect to database...");
     let mut opt = sea_orm::ConnectOptions::new(config.database_url);
@@ -40,9 +41,7 @@ async fn main() -> Result<(), Error> {
 
     let app = Router::new()
         .route("/", get(|| async { "Hello, World!" }))
-        .route("/login", post(handle_login))
-        .route("/logout", post(handle_logout))
-        .route("/me", post(handle_me))
+        .nest("/auth", auth_router())
         .nest("/users", user_router())
         .with_state(app_state)
         .layer(TraceLayer::new_for_http());

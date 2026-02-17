@@ -1,5 +1,6 @@
 use axum::extract::State;
-use axum::Json;
+use axum::routing::post;
+use axum::{Json, Router};
 use validator::Validate;
 
 use crate::modules::auth::middleware::ExtractAuthInfos;
@@ -47,4 +48,11 @@ pub async fn handle_logout(
     Ok(Json(SessionTokenDTO {
         token: session_token_dto.token,
     }))
+}
+
+pub fn auth_router() -> Router<AppState> {
+    Router::new()
+        .route("/login", post(handle_login))
+        .route("/logout", post(handle_logout))
+        .route("/me", post(handle_me))
 }

@@ -5,9 +5,13 @@ meta {
 }
 
 post {
-  url: {{base_url}}/logout
+  url: {{base_url}}/auth/logout
   body: none
   auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{auth_token}}
 }
 
 settings {
