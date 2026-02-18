@@ -1,10 +1,8 @@
 use axum::extract::{Path, State};
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
-use validator::Validate;
 
 use crate::modules::auth::extractor::ExtractAuthInfos;
-use crate::modules::errors::ServiceError;
 use crate::modules::responses::ApiError;
 use crate::modules::states::AppState;
 use crate::modules::types::ApiResponse;
