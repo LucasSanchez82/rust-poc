@@ -47,7 +47,7 @@ impl From<ValidationErrors> for ApiError {
         Self {
             details: Some(error.to_string()),
             error: "The request body is malformated".to_string(),
-            status: StatusCode::NOT_FOUND.as_u16(),
+            status: StatusCode::BAD_REQUEST.as_u16(),
         }
     }
 }

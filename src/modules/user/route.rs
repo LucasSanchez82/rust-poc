@@ -10,6 +10,7 @@ use crate::modules::types::ApiResponse;
 use crate::modules::user::dto::UserDto;
 use crate::modules::user::payload::CreateUser;
 use crate::modules::user::service::UserService;
+use crate::utils::extractor::ExtractValidated;
 
 pub fn user_router() -> Router<AppState> {
     Router::new()
@@ -21,10 +22,9 @@ pub fn user_router() -> Router<AppState> {
 
 async fn handle_create_initial_root_user(
     state: State<AppState>,
-    Json(payload): Json<CreateUser>,
+    ExtractValidated(payload): ExtractValidated<CreateUser>,
 ) -> ApiResponse<UserDto> {
     let user_svc = UserService::new(&state.connection);
-    payload.validate()?;
     user_svc
         .create_initial_root_user(payload)
         .await
@@ -47,15 +47,8 @@ async fn handle_delete_user(
 
 async fn handle_create_user(
     State(state): State<AppState>,
-    Json(payload): Json<CreateUser>,
+    ExtractValidated(payload): ExtractValidated<CreateUser>,
 ) -> ApiResponse<UserDto> {
-    payload.validate().map_err(|e| {
-        ApiError::from(
-            ServiceError::new(axum::http::StatusCode::BAD_REQUEST, "Validation error")
-                .with_details(e.to_string()),
-        )
-    })?;
-
     let user_svc = UserService::new(&state.connection);
     user_svc
         .create(payload)
