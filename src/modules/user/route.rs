@@ -3,6 +3,7 @@ use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use validator::Validate;
 
+use crate::modules::auth::extractor::ExtractAuthInfos;
 use crate::modules::errors::ServiceError;
 use crate::modules::responses::ApiError;
 use crate::modules::states::AppState;
@@ -39,6 +40,7 @@ async fn handle_get_users(State(state): State<AppState>) -> ApiResponse<Vec<User
 
 async fn handle_delete_user(
     State(state): State<AppState>,
+    ExtractAuthInfos(_): ExtractAuthInfos,
     Path(id): Path<i32>,
 ) -> ApiResponse<UserDto> {
     let user_svc = UserService::new(&state.connection);
@@ -47,6 +49,7 @@ async fn handle_delete_user(
 
 async fn handle_create_user(
     State(state): State<AppState>,
+    ExtractAuthInfos(_): ExtractAuthInfos,
     ExtractValidated(payload): ExtractValidated<CreateUser>,
 ) -> ApiResponse<UserDto> {
     let user_svc = UserService::new(&state.connection);
