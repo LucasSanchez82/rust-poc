@@ -1,8 +1,8 @@
-
 use axum::http::{StatusCode, header::AUTHORIZATION};
 
 use crate::modules::{
-    auth::dto::AuthSession, responses::ApiError, session::service::SessionService, states::AppState,
+    auth::domain::AuthSession, responses::ApiError, session::service::SessionService,
+    states::AppState,
 };
 
 use axum::{extract::FromRequestParts, http::request::Parts};
