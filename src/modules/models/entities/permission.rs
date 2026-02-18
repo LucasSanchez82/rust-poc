@@ -10,6 +10,15 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
     pub description: Option<String>,
+    pub role_id: i32,
+    #[sea_orm(
+        belongs_to,
+        from = "role_id",
+        to = "id",
+        on_update = "NoAction",
+        on_delete = "NoAction"
+    )]
+    pub role: HasOne<super::role::Entity>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

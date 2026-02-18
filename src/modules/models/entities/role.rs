@@ -11,6 +11,17 @@ pub struct Model {
     pub id: i32,
     pub name: String,
     pub description: Option<String>,
+    pub user_id: i32,
+    #[sea_orm(has_many)]
+    pub permissions: HasMany<super::permission::Entity>,
+    #[sea_orm(
+        belongs_to,
+        from = "user_id",
+        to = "id",
+        on_update = "NoAction",
+        on_delete = "NoAction"
+    )]
+    pub user: HasOne<super::user::Entity>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

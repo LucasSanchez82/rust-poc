@@ -14,6 +14,8 @@ pub struct Model {
     pub email: String,
     pub password: String,
     #[sea_orm(has_many)]
+    pub roles: HasMany<super::role::Entity>,
+    #[sea_orm(has_many)]
     pub sessions: HasMany<super::session::Entity>,
 }
 

@@ -33,6 +33,12 @@ impl MigrationTrait for Migration {
                     .col(pk_auto("id"))
                     .col(string("name"))
                     .col(string_null("description"))
+                    .col(integer("user_id"))
+                    .foreign_key(
+                        ForeignKey::create()
+                            .from("role", "user_id")
+                            .to("user", "id"),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -44,6 +50,12 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(string("id").primary_key())
                     .col(string_null("description"))
+                    .col(integer("role_id"))
+                    .foreign_key(
+                        ForeignKey::create()
+                            .from("permission", "role_id")
+                            .to("role", "id"),
+                    )
                     .to_owned(),
             )
             .await?;
@@ -70,6 +82,9 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
+        manager
+            .drop_table(Table::drop().table("session").to_owned())
+            .await?;
         manager
             .drop_table(Table::drop().table("permission").to_owned())
             .await?;
