@@ -1,6 +1,7 @@
 use sea_orm_migration::prelude::*;
 use sea_orm_migration::schema::{
-    integer, pk_auto, string, timestamp_with_time_zone, timestamp_with_time_zone_null, uuid,
+    integer, pk_auto, string, string_null, timestamp_with_time_zone, timestamp_with_time_zone_null,
+    uuid,
 };
 
 #[derive(DeriveMigrationName)]
@@ -20,6 +21,29 @@ impl MigrationTrait for Migration {
                     .col(string("name"))
                     .col(string("email").unique_key())
                     .col(string("password"))
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_table(
+                Table::create()
+                    .table("role")
+                    .if_not_exists()
+                    .col(pk_auto("id"))
+                    .col(string("name"))
+                    .col(string_null("description"))
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_table(
+                Table::create()
+                    .table("permission")
+                    .if_not_exists()
+                    .col(string("id").primary_key())
+                    .col(string_null("description"))
                     .to_owned(),
             )
             .await?;
@@ -47,7 +71,10 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         manager
-            .drop_table(Table::drop().table("session").to_owned())
+            .drop_table(Table::drop().table("permission").to_owned())
+            .await?;
+        manager
+            .drop_table(Table::drop().table("role").to_owned())
             .await?;
         manager
             .drop_table(Table::drop().table("user").to_owned())
