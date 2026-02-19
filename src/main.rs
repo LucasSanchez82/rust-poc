@@ -10,6 +10,7 @@ use tower_http::trace::TraceLayer;
 use tracing::info;
 
 use crate::modules::auth::route::auth_router;
+use crate::modules::docker::route::docker_router;
 use crate::modules::states::AppState;
 use crate::modules::user::route::user_router;
 use crate::utils::cfg::Config;
@@ -21,14 +22,14 @@ pub mod utils;
 async fn main() -> Result<(), Error> {
     use migration::{Migrator, MigratorTrait};
 
-    let config = Config::new();
+    let config = Config::instance();
 
     tracing_subscriber::fmt()
         .with_max_level(config.log_level)
         .init();
 
     info!("Trying to connect to database...");
-    let mut opt = sea_orm::ConnectOptions::new(config.database_url);
+    let mut opt = sea_orm::ConnectOptions::new(&config.database_url);
     opt.max_connections(2).min_connections(1);
     let connection = Arc::new(sea_orm::Database::connect(opt).await?);
     Migrator::up(connection.as_ref(), None).await?;
@@ -39,6 +40,7 @@ async fn main() -> Result<(), Error> {
         .route("/", get(|| async { "Hello, World!" }))
         .nest("/auth", auth_router())
         .nest("/users", user_router())
+        .nest("/docker", docker_router())
         .with_state(app_state)
         .layer(TraceLayer::new_for_http());
 

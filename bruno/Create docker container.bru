@@ -1,0 +1,26 @@
+meta {
+  name: Create docker container
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{base_url}}/docker/mariadb
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "test",
+    "root_password": "test",
+  //   "database": "../Dockerfile",
+  //   "user": "true",
+  //   "password", "test", "port": 3000,  
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
