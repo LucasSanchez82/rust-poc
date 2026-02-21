@@ -14,8 +14,13 @@ pub struct DockerMariadbPayload {
     pub name: String,
     #[validate(length(min = 1, message = "root_password cannot be empty"))]
     pub root_password: String,
-    pub database: Option<String>,
+    pub database_name: Option<String>,
     pub user: Option<String>,
     pub password: Option<String>,
     pub port: Option<u16>,
+}
+
+#[derive(Deserialize, Validate)]
+pub struct GetContainerStatusPayload {
+    pub container_name: String,
 }

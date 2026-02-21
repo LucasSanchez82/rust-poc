@@ -28,13 +28,23 @@ impl Into<ApiResponse<DockerDTO>> for DockerDTO {
 }
 
 #[derive(Serialize)]
-pub struct ContainerDTO {
+pub struct CreateContainerDTO {
     pub id: String,
     pub name: String,
 }
 
-impl Into<ApiResponse<ContainerDTO>> for ContainerDTO {
-    fn into(self) -> ApiResponse<ContainerDTO> {
+impl Into<ApiResponse<CreateContainerDTO>> for CreateContainerDTO {
+    fn into(self) -> ApiResponse<CreateContainerDTO> {
+        Ok(Json(self))
+    }
+}
+#[derive(Serialize)]
+pub struct GetContainerStatusDTO {
+    pub status: String,
+}
+
+impl Into<ApiResponse<GetContainerStatusDTO>> for GetContainerStatusDTO {
+    fn into(self) -> ApiResponse<GetContainerStatusDTO> {
         Ok(Json(self))
     }
 }

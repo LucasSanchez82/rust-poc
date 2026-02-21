@@ -1,7 +1,6 @@
-
 use axum::http::StatusCode;
 use sea_orm::DbErr;
-use tracing::warn;
+use tracing::{error, warn};
 
 #[derive(Debug)]
 pub struct ServiceError {
@@ -20,7 +19,11 @@ impl ServiceError {
     }
 
     pub fn with_details(mut self, details: impl Into<String>) -> Self {
-        self.details = Some(details.into());
+        let details_str: String = details.into();
+        if self.status == StatusCode::INTERNAL_SERVER_ERROR {
+            error!("{}\ndetails: {}", self.message, details_str);
+        }
+        self.details = Some(details_str);
         self
     }
 
@@ -59,5 +62,15 @@ impl From<DbErr> for ServiceError {
     fn from(value: DbErr) -> Self {
         warn!("DB ERROR: {:#?}", value);
         Self::internal("Internal Error during the processing of your request...")
+    }
+}
+
+impl From<bollard::errors::Error> for ServiceError {
+    fn from(value: bollard::errors::Error) -> Self {
+        Self {
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            message: "Internal error".to_string(),
+            details: Some(value.to_string()),
+        }
     }
 }

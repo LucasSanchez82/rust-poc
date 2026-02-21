@@ -1,10 +1,10 @@
 meta {
-  name: Create user
+  name: Delete user
   type: http
   seq: 2
 }
 
-post {
+delete {
   url: {{base_url}}/users
   body: json
   auth: inherit
@@ -12,9 +12,7 @@ post {
 
 body:json {
   {
-    "email": "tes2t@gmail.Com",
-    "name": "toto",
-    "password": "passwordForToto"
+    "id": 4
   }
 }
 

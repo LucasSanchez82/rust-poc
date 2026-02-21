@@ -9,6 +9,12 @@ rustup override set nightly
 
 ## Prerequisites
 
+You need to install `docker` engine, then pull the mariadb image
+
+```bash
+docker pull mariadb
+```
+
 ### Libs
 
 Lib to install ( use `aptitude search <lib>` to see packages that provide this lib)
